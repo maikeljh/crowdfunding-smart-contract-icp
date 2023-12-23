@@ -72,13 +72,13 @@ export default Canister({
     createProject: update([ProjectPayload], Result(Project, Error), (payload) => {
         try {
             // Validate payload attributes
-            if(!payload || !payload.duration || !payload.title || !payload.description || !payload.creator || !payload.goalAmount){
-                return Err({ InvalidPayload: `The payload has missing attributes`})
+            if (!payload || !payload.duration || !payload.title || !payload.description || !payload.creator || !payload.goalAmount) {
+                return Err({ InvalidPayload: `The payload has missing attributes` })
             }
 
             // Create unique id
             let id = generateId();
-            while(!("None" in crowdfundingProjects.get(id))){
+            while (!("None" in crowdfundingProjects.get(id))) {
                 id = generateId();
             }
 
@@ -92,12 +92,12 @@ export default Canister({
                 status: ProjectStatus.Funding,
                 ...payload
             };
-            
+
             // Insert the project into the map
             crowdfundingProjects.insert(project.id, project);
             return Ok(project);
-        } catch (error: any){
-            return Err({ Fail: `Failed to add project: ${error}`})
+        } catch (error: any) {
+            return Err({ Fail: `Failed to add project: ${error}` })
         }
     }),
 
@@ -105,8 +105,8 @@ export default Canister({
     contributeToProject: update([Principal, Contributor], Result(Project, Error), (projectId, payload) => {
         try {
             // Validate input parameters
-            if(!projectId || !payload || !payload.contributor || !payload.amount){
-                return Err({ InvalidPayload: `The payload has missing attributes`})
+            if (!projectId || !payload || !payload.contributor || !payload.amount) {
+                return Err({ InvalidPayload: `The payload has missing attributes` })
             }
 
             // Retrieve the project from the map
@@ -137,8 +137,8 @@ export default Canister({
             crowdfundingProjects.insert(project.id, project);
 
             return Ok(project);
-        } catch (error: any){
-            return Err({ Fail: `Failed to contribute to project: ${error}`})
+        } catch (error: any) {
+            return Err({ Fail: `Failed to contribute to project: ${error}` })
         }
     }),
 
@@ -146,9 +146,9 @@ export default Canister({
     // Retrieves a list of crowdfunding projects based on their status if provided
     getProjects: query([text], Result(Vec(Project), Error), (status) => {
         try {
-            if(status){
+            if (status) {
                 // Filter projects by status if provided
-                const projects = crowdfundingProjects.values().filter(project => 
+                const projects = crowdfundingProjects.values().filter(project =>
                     project.status == status
                 );
                 return Ok(projects);
@@ -156,8 +156,8 @@ export default Canister({
                 // Return all projects if no status is provided
                 return Ok(crowdfundingProjects.values());
             }
-        } catch (error : any){
-            return Err({ Fail: `Failed to get projects: ${error}`})
+        } catch (error: any) {
+            return Err({ Fail: `Failed to get projects: ${error}` })
         }
     }),
 
@@ -173,8 +173,8 @@ export default Canister({
             // Extract the project from the option
             const project = projectOpt.Some;
             return Ok(project);
-        } catch (error : any){
-            return Err({ Fail: `Failed to get project: ${error}`})
+        } catch (error: any) {
+            return Err({ Fail: `Failed to get project: ${error}` })
         }
     }),
 
@@ -190,8 +190,8 @@ export default Canister({
             // Extract the project from the option
             const project = projectOpt.Some;
             return Ok(project.contributors);
-        } catch (error : any){
-            return Err({ Fail: `Failed to get contributor: ${error}`})
+        } catch (error: any) {
+            return Err({ Fail: `Failed to get contributor: ${error}` })
         }
     }),
 
@@ -200,8 +200,8 @@ export default Canister({
     updateStatus: update([Principal, text], Result(Project, Error), (projectId, status) => {
         try {
             // Validate input parameters
-            if(!projectId || !status){
-                return Err({ InvalidPayload: `The payload has missing attributes`})
+            if (!projectId || !status) {
+                return Err({ InvalidPayload: `The payload has missing attributes` })
             }
 
             // Retrieve the project from the map
@@ -214,16 +214,16 @@ export default Canister({
             const project = projectOpt.Some;
 
             // Check if the provided status is a valid project status
-            if(status in ProjectStatus){
+            if (status in ProjectStatus) {
                 // Update project status
                 project.status = status;
                 crowdfundingProjects.insert(project.id, project);
                 return Ok(project);
             } else {
-                return Err({ InvalidStatus: `Invalid status given`})
+                return Err({ InvalidStatus: `Invalid status given` })
             }
-        } catch (error: any){
-            return Err({ Fail: `Failed to update status project: ${error}`})
+        } catch (error: any) {
+            return Err({ Fail: `Failed to update status project: ${error}` })
         }
     }),
 
@@ -231,8 +231,8 @@ export default Canister({
     updateProject: update([Principal, ProjectPayload], Result(Project, Error), (projectId, payload) => {
         try {
             // Validate payload attributes
-            if(!payload || !payload.duration || !payload.title || !payload.description || !payload.creator || !payload.goalAmount){
-                return Err({ InvalidPayload: `The payload has missing attributes`})
+            if (!payload || !payload.duration || !payload.title || !payload.description || !payload.creator || !payload.goalAmount) {
+                return Err({ InvalidPayload: `The payload has missing attributes` })
             }
 
             // Retrieve the project from the map
@@ -245,8 +245,8 @@ export default Canister({
             const project = projectOpt.Some;
 
             // Check if the updated project duration is valid
-            if(project.startTime + payload.duration < ic.time()){
-                return Err({ InvalidPayload: `Invalid duration`})
+            if (project.startTime + payload.duration < ic.time()) {
+                return Err({ InvalidPayload: `Invalid duration` })
             }
 
             // Update project details with the new payload, ensuring valid attributes
@@ -263,8 +263,8 @@ export default Canister({
             // Update the project in the map
             crowdfundingProjects.insert(updatedProject.id, updatedProject);
             return Ok(updatedProject);
-        } catch (error: any){
-            return Err({ Fail: `Failed to add project: ${error}`})
+        } catch (error: any) {
+            return Err({ Fail: `Failed to add project: ${error}` })
         }
     }),
 
@@ -273,8 +273,8 @@ export default Canister({
     cancelProject: update([Principal], Result(Project, Error), (projectId) => {
         try {
             // Validate input parameter
-            if(!projectId){
-                return Err({ InvalidPayload: `The payload has missing attributes`})
+            if (!projectId) {
+                return Err({ InvalidPayload: `The payload has missing attributes` })
             }
 
             // Retrieve the project from the map
@@ -291,17 +291,17 @@ export default Canister({
             crowdfundingProjects.insert(project.id, project);
 
             return Ok(project);
-        } catch (error: any){
-            return Err({ Fail: `Failed to update status project: ${error}`})
+        } catch (error: any) {
+            return Err({ Fail: `Failed to update status project: ${error}` })
         }
     }),
 });
 
-// Function to create unique id
+// Function to create a unique id
 const generateId = (): Principal => {
-  const randomBytes = new Array(29)
-      .fill(0)
-      .map((_) => Math.floor(Math.random() * 256));
+    const randomBytes = new Array(29)
+        .fill(0)
+        .map((_) => Math.floor(Math.random() * 256));
 
-  return Principal.fromUint8Array(Uint8Array.from(randomBytes));
+    return Principal.fromUint8Array(Uint8Array.from(randomBytes));
 }
